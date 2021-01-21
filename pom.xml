@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.2</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.sagape</groupId>
+	<artifactId>docker-cassandra-with-initial-seed</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>docker-cassandra-with-initial-seed</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>11</java.version>
+		<spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+		<it.test.server.host>localhost</it.test.server.host>§§§11§
+		<it.test.server.port>8888</it.test.server.port>
+		<it.test.docker.cassandra.script>${project.basedir}/src/main/resources/cassandra/docker-cassandra.sh</it.test.docker.cassandra.script>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-cassandra</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.7.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.18.1</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<!-- Exec plugin
+                    - starts/stops mongodb on docker before/after integration tests
+                    - saves mongodb logs before stopping mongodb container
+                -->
+				<artifactId>exec-maven-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<version>1.6.0</version><!-- TODO: update version -->
+				<executions>
+					<execution>
+						<id>local-cassandra-start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${it.test.docker.cassandra.script}</executable>
+							<arguments>
+								<argument>restart</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>local-cassandra-stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${it.test.docker.cassandra.script}</executable>
+							<arguments>
+								<argument>stop</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- Spring Boot Plugin
+                        - depends on start cassandra, see exec plugin
+                        - starts/stops API server before/after integration tests
+                -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
+				<configuration>
+					<classifier>exec</classifier>
+					<jmxPort>9001</jmxPort>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>api-server-start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<systemPropertyVariables>
+								<server.host>${it.test.server.host}</server.host>
+								<server.port>${it.test.server.port}</server.port>
+								<spring.main.banner-mode>off</spring.main.banner-mode>
+							</systemPropertyVariables>
+						</configuration>
+					</execution>
+					<execution>
+						<id>api-server-stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
