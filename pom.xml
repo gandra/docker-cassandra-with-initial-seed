@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-		<it.test.server.host>localhost</it.test.server.host>§§§11§
+		<it.test.server.host>localhost</it.test.server.host>
 		<it.test.server.port>8888</it.test.server.port>
 		<it.test.docker.cassandra.script>${project.basedir}/src/main/resources/cassandra/docker-cassandra.sh</it.test.docker.cassandra.script>
 	</properties>

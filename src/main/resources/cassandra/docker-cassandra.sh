@@ -38,7 +38,7 @@ function cassandra_start () {
         docker image inspect $CASSANDRA_IMG_NAME >/dev/null 2>&1 && docker image rm $CASSANDRA_IMG_NAME || echo "image $CASSANDRA_IMG_NAME not present"
     fi
     docker build -t $CASSANDRA_IMG_NAME .
-    docker run --rm --name $CASSANDRA_CNR_NAME -d -p8091:8091 -p1099:1099 -p9001:9001 -p$CASSANDRA_HOST_PORT:9042 $CASSANDRA_IMG_NAME
+    docker run --rm --name $CASSANDRA_CNR_NAME -d -p8091:8091 -p1099:1099 -p$CASSANDRA_HOST_PORT:9042 $CASSANDRA_IMG_NAME
 }
 
 check_is_present 1 "<cmd> (start, stop, restart)" "$CMD"
