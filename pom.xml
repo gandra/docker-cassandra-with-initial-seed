@@ -19,6 +19,9 @@
 		<it.test.server.host>localhost</it.test.server.host>
 		<it.test.server.port>8888</it.test.server.port>
 		<it.test.docker.cassandra.script>${project.basedir}/src/main/resources/cassandra/docker-cassandra.sh</it.test.docker.cassandra.script>
+		<it.test.docker.cassandra.image>demoapp-cassandra-image-test</it.test.docker.cassandra.image>
+		<it.test.docker.cassandra.container.name>demoapp-cassandra-container-test</it.test.docker.cassandra.container.name>
+		<it.test.docker.cassandra.port>9043</it.test.docker.cassandra.port>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -113,6 +116,7 @@
 				<configuration>
 					<classifier>exec</classifier>
 					<jmxPort>9001</jmxPort>
+					<wait>1000</wait>
 				</configuration>
 				<executions>
 					<execution>
@@ -142,6 +146,30 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- Failsafe plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<trimStackTrace>false</trimStackTrace>
+					<systemPropertyVariables>
+						<server.host>${it.test.server.host}</server.host>
+						<server.port>${it.test.server.port}</server.port>
+						<spring.main.banner-mode>off</spring.main.banner-mode>
+						<spring.data.cassandra.port>${it.test.docker.cassandra.port}</spring.data.cassandra.port>
+					</systemPropertyVariables>
+				</configuration>
 			</plugin>
 
 		</plugins>

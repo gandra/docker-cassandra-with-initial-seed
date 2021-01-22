@@ -28,6 +28,7 @@ function cassandra_stop () {
     cnr_id=$(docker ps --filter "name=$CASSANDRA_CNR_NAME" -q)
     [ "$?" != "0" ] && { >&2 echo "docker ps failed"; exit 1; }
     [ ! -z "$cnr_id" ] &&  docker stop $CASSANDRA_CNR_NAME
+    sleep 5
 }
 
 function cassandra_start () {
@@ -39,6 +40,7 @@ function cassandra_start () {
     fi
     docker build -t $CASSANDRA_IMG_NAME .
     docker run --rm --name $CASSANDRA_CNR_NAME -d -p8091:8091 -p1099:1099 -p$CASSANDRA_HOST_PORT:9042 $CASSANDRA_IMG_NAME
+    sleep 20
 }
 
 check_is_present 1 "<cmd> (start, stop, restart)" "$CMD"
